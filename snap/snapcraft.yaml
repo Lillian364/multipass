@@ -92,6 +92,19 @@ apps:
       - wayland
       - x11
       - system-observe
+  desktop-gui:
+    environment: *client-environment
+    command: bin/desktop_gui_bundle/desktop_gui
+    plugs:
+      - desktop
+      - desktop-legacy
+      - network
+      - opengl
+      - unity7
+      - wayland
+      - x11
+    extensions:
+      - gnome
 
 parts:
   libvirt:
@@ -288,3 +301,21 @@ parts:
   glue:
     plugin: dump
     source: snap-wrappers
+
+  desktop-gui:
+    plugin: nil
+    source: ./src/client/desktop_gui
+    build-snaps:
+      - flutter
+    build-packages:
+      - libgtk-3-dev
+    stage-packages:
+      - libgl1-mesa-dri
+      - libgl1-mesa-glx
+      - libglu1-mesa
+      - libwayland-egl1-mesa
+    override-build: |
+      rm -f /root/parts/desktop_gui/build/build/linux/x64/release/CMakeCache.txt
+      flutter --suppress-analytics build linux
+    organize:
+      /root/parts/desktop-gui/build/build/linux/x64/release/bundle: bin/desktop_gui_bundle
